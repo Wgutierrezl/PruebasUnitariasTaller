@@ -57,6 +57,32 @@ namespace TestUnitario
             Assert.Equal("Debes de llenar todos los campos del producto", badRequest.Value);
         }
 
+        [Fact]
+        public async Task AgregarProducto_DevuelveBadRequest_SiPrecioOCantidadSonInvalidos()
+        {
+            // Arrange
+            var dto = new ProductoDTO
+            {
+                Nombre = "Test",
+                Descripcion = "Desc",
+                Precio = -10, // inválido
+                Cantidad = -1 // inválido
+            };
+
+            // Forzar la validación del modelo
+            _controller.ModelState.AddModelError("Precio", "El precio debe ser mayor a cero");
+            _controller.ModelState.AddModelError("Cantidad", "La cantidad debe ser al menos 1");
+
+            // Act
+            var result = await _controller.AgregarProducto(dto);
+
+            // Assert
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result.Result);
+            var error = Assert.IsType<SerializableError>(badRequest.Value);
+            Assert.True(error.ContainsKey("Precio"));
+            Assert.True(error.ContainsKey("Cantidad"));
+        }
+
 
         //PRUEBA GET, CASO CORRECTO, DEVUELVE EL VALOR NOMBRE DEL PRODUCTO
         [Fact]

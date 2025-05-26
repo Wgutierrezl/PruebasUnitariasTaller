@@ -20,6 +20,9 @@ namespace PruebaUnitariaBack.Controllers
         [HttpPost("AgregarProducto")]
         public async Task<ActionResult<Producto>> AgregarProducto([FromBody] ProductoDTO producto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (producto == null)
             {
                 return BadRequest("Debes de llenar todos los campos del producto");
